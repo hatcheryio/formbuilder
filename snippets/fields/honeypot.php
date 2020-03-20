@@ -2,7 +2,6 @@
 
     // FLAGS and VARIABLES that make our code easier to read:
     $name = $fld->field_name();
-    $useDiv = $pg->fb_usediv()->toBool();
 
     if($data != false and isset($data[$name->value()])) {
         // this is a return to a previously entered form -
@@ -13,12 +12,9 @@
         $value = '';
     }
 
-    if($pg->fb_usediv()->toBool()):
 ?>
+
 <div style="display: none;" aria-hidden="true">
-<?php endif; ?>
-    <label for="<?= $name ?>"<?php if(!$useDiv):?> style="display: none;" aria-hidden="true"<?php endif; ?>><?= $name ?></label>
-    <input type="text" name="<?= $name ?>" id="<?= $name ?>"<?php if(!$useDiv):?> style="display: none;" aria-hidden="true"<?php endif; ?> autocomplete="off" value="<?= $value ?>">
-<?php if($useDiv): ?>
+    <label for="<?= $name ?>"><?= $name ?></label>
+    <input type="text" name="<?= $name ?>" id="<?= $name ?>" autocomplete="off" value="<?= $value ?>">
 </div>
-<?php endif; ?>

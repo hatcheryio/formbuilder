@@ -1,8 +1,0 @@
-/* hiding the 'Add +' button above the 'Received Submissions' list */
-.k-field-name-fb_received_submissions > header.k-field-header > button.k-button {
-  display: none;
-}
-
-.k-field-name-fb_received_submissions > section.k-structure-form > footer.k-structure-form-buttons > button.k-button.k-structure-form-submit-button {
-  display: none;
-}

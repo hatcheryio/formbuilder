@@ -2,7 +2,6 @@
     // FLAGS and VARIABLES that make our code easier to read:
     $name = $fld->field_name();
     $class = $fld->field_class()->isEmpty() ? false : $fld->field_class()->html();
-    $useDiv = $pg->fb_usediv()->toBool();
     $label = $fld->field_label()->isEmpty() ? false : $fld->field_label()->html();
     $placeholder = $fld->placeholder()->isEmpty() ? false : $fld->placeholder()->html();
     $min = $fld->min()->isEmpty() ? false : $fld->min()->toInt();
@@ -19,15 +18,10 @@
         // this is a brand new form - enter the default value from the panel:
         $value = $fld->default()->isEmpty() ? '' : $fld->default()->html();
     }
-
-    if($useDiv):
 ?>
 <div<?php if($class): ?> class="<?= $class ?>"<?php endif; ?>>
-<?php endif; ?>
 <?php if($label):?>
     <label for="<?= $name ?>"><?= $label ?></label>
 <?php endif; ?>
-    <input type="<?= $type ?>" name="<?= $name ?>" id="<?= $name ?>"<?php if(!$useDiv and $class): ?> class="<?= $class ?>"<?php endif; ?> value="<?= $value ?>"<?php if($placeholder): ?> placeholder="<?= $placeholder ?>"<?php endif; ?><?php if($min):?> minlength="<?= $min ?>"<?php endif; ?><?php if($max):?> maxlength="<?= $max ?>"<?php endif; ?><?php if($pattern):?> pattern="<?= $pattern ?>"<?php endif; ?><?php if($req):?> required<?php endif; ?>>
-<?php if($useDiv): ?>
+    <input type="<?= $type ?>" name="<?= $name ?>" id="<?= $name ?>"<?php if($class): ?> class="<?= $class ?>"<?php endif; ?> value="<?= $value ?>"<?php if($placeholder): ?> placeholder="<?= $placeholder ?>"<?php endif; ?><?php if($min):?> minlength="<?= $min ?>"<?php endif; ?><?php if($max):?> maxlength="<?= $max ?>"<?php endif; ?><?php if($pattern):?> pattern="<?= $pattern ?>"<?php endif; ?><?php if($req):?> required<?php endif; ?>>
 </div>
-<?php endif; ?>

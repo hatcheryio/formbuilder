@@ -1,5 +1,9 @@
 <?php
 
+use \Kirby\Database\Db;
+use \Kirby\Cms\Response;
+use \Kirby\Cms\App as Kirby;
+
 Kirby::plugin('cre8ivclick/formbuilder', [
     'blueprints' => [
         'formbuilder' => __DIR__ . '/blueprints/formbuilder.yml',
@@ -53,274 +57,282 @@ Kirby::plugin('cre8ivclick/formbuilder', [
             'action'  => function () {
                 // VALIDATION CHECKES:
                 $data = get();
-                // start by checking whether this is a formbuilder submission -
-                // by checking, for example, whether we can get a page id:
-                if(!isset($data['fb_pg_id'])) {
-                    $body = '<h1>Processing Error 400</h1><p>Page ID information not found.</p>';
-                    return new Response($body,'text/html', 400,['Warning'=>'Page ID not found']);
-                }
-                // then, check whether the page exists:
-                if(!$pg = page($data['fb_pg_id'])) {
-                    $body = '<h1>Processing Error 406</h1><p>Referenced Page ID does not exist.</p>';
-                    return new Response($body,'text/html', 406,['Warning'=>'Page ID does not exist']);
-                } else {
-                    // page ID has now been stored in the $pg variable,
-                    // so we can remove the pg_id field from our data array:
-                    unset($data['fb_pg_id']);
-                }
-                // then, check whether the page has all the fields required for our logic:
-                if(!$pg->fb_builder()->exists() or !$pg->fb_is_ajax()->exists() or !$pg->fb_captcha()->exists() or !$pg->fb_send_email()->exists() or !$pg->fb_save_submissions()->exists()) {
-                    $body = '<h1>Processing Error 422</h1><p>Page does not contain needed fields.</p>';
-                    return new Response($body,'text/html', 422,['Warning'=>'Page does not have needed fields']);
-                }
-                // if user has selected to redirect to success/error pages,
-                // let's make sure these pages exist:
-                $ajax = $pg->fb_is_ajax()->toBool();
-                $sPage = $pg->fb_success_page()->exists() ? $pg->fb_success_page()->toPage() : false;
-                $ePage = $pg->fb_error_page()->exists() ? $pg->fb_error_page()->toPage() : false;
-                if(!$ajax and (!$sPage or !$ePage)){
-                    $body = '<h1>Processing Error 422</h1><p>Missing success/error page.</p>';
-                    return new Response($body,'text/html', 422,['Warning'=>'Missing success/error page']);
-                }
-
-                // check the CSRF token:
-                if(!isset($data['fb_csrf']) or csrf($data['fb_csrf']) !== true) {
-                    if (!$ajax) {
-                        // if the form is not using ajax, we send the user
-                        // to the error page, with appropriate data & info:
-                        $data = [
-                            'fields' => $data,
-                            'error' => 'No valid CSRF token received.'
-                        ];
-                        return $ePage->render($data);
+                try {
+                    // start by checking whether this is a formbuilder submission -
+                    // by checking, for example, whether we can get a page id:
+                    if (!isset($data['fb_pg_id'])) {
+                        throw new Exception('Page ID not found.', 400);
                     }
-                    // if the user is using ajax, we return an error:
-                    $body = '<h1>Processing Error 403</h1><p>No valid CSRF token received.</p>';
-                    return new Response($body,'text/html', 403,['Warning'=>'No valid CSRF token']);
-                } else {
-                    // passed CSRF check, so we can delete the CSRF field from our data array:
-                    unset($data['fb_csrf']);
-                }
-
-                // check honeypots:
-                $honeyfields = $pg->fb_builder()->toBuilderBlocks()->filterBy('_key','==','fb_honeypot');
-                if(count($honeyfields) > 0){
-                    foreach ($honeyfields as $field) {
-                        // the honeypot field should be empty -
-                        // if it's not, it was probably filled in by a spammer bot:
-                        if(!empty($data[$field->field_name()->value()])) {
-                            if (!$ajax) {
-                                // if the form is not using ajax, we send the user
-                                // to the error page, with appropriate data & info:
-                                $data = [
-                                    'fields' => $data,
-                                    'error' => 'Bot submission violation.'
-                                ];
-                                return $ePage->render($data);
-                            }
-                            // if the user is using ajax, we return an error:
-                            $body = '<h1>Processing Error 403</h1><p>Bot submission detected.</p>';
-                            return new Response($body,'text/html', 403,['Warning'=>'Bot submission detected']);
-                        }
-                        // honeypot is empty - we can remove the field from our data array:
-                        unset($data[$field->field_name()->value()]);
-                    }
-                }
-                // hCaptcha check - if it is being used:
-                if($pg->fb_captcha()->toBool() and $pg->fb_captcha_sitekey()->isNotEmpty() and $pg->fb_captcha_secretkey()->isNotEmpty()) {
-                    // check that the hCaptcha token has been set -
-                    // that is, the captcha has been answered and submitted::
-                    if(isset($data['h-captcha-response']) and !empty($data['h-captcha-response'])) {
-                        $hData = [
-                            'response' => $data['h-captcha-response'],
-                            'secret' => $pg->fb_captcha_secretkey()->value()
-                        ];
-                        $options = [
-                            'method'  => 'POST',
-                            'data'    => http_build_query($hData)
-                        ];
-                        $response = Remote::request('https://hcaptcha.com/siteverify',$options);
-                        $response = $response->json();
-                        // check whether the hCaptcha was answered successfully::
-                        if($response['success'] == false){
-                            if (!$ajax) {
-                                // if the form is not using ajax, we send the user
-                                // to the error page, with appropriate data & info:
-                                $data = [
-                                    'fields' => $data,
-                                    'error' => 'hCatpcha not validated.'
-                                ];
-                                return $ePage->render($data);
-                            }
-                            // if the user is using ajax, we return an error:
-                            $body = '<h1>Processing Error 403</h1><p>hCaptcha not validated.</p>';
-                            return new Response($body,'text/html', 403,['Warning'=>'hCaptcha not validated']);
-                        } else {
-                            // captcha has been answered successfully,
-                            // so we can now remove it from our data array:
-                            unset($data['h-captcha-response']);
-                            if(isset($data['g-recaptcha-response'])) {
-                                unset($data['g-recaptcha-response']);
-                            }
-                        }
+                    // then, check whether the page exists:
+                    if (!$pg = page($data['fb_pg_id'])) {
+                        throw new Exception('Page ID does not exist.', 406);
                     } else {
-                        // captcha token hasn't been set - possible form hijacking:
-                        if (!$ajax) {
-                            // if the form is not using ajax, we send the user
-                            // to the error page, with appropriate data & info:
-                            $data = [
-                                'fields' => $data,
-                                'error' => 'hCaptcha expected.'
+                        // page ID has now been stored in the $pg variable,
+                        // so we can remove the pg_id field from our data array:
+                        unset($data['fb_pg_id']);
+                    }
+
+                    foreach ($pg->builder()->toBuilderBlocks() as $block) :
+                        // Check if the fb_builder property exists, which means that this is our form block
+                        if ($block->fb_builder()->isNotEmpty()) {
+                            /**
+                             * Formbuilder only accepts a page as an input property, not the data itself.
+                             * We need to manually update the content property of the page with our block data to get formbuilder to accept the page object.
+                             */
+                            $pg->content()->update($block->toArray());
+                        }
+                    endforeach;
+
+                    // then, check whether the page has all the fields required for our logic:
+                    if (!$pg->fb_builder()->exists() or !$pg->fb_is_ajax()->exists() or !$pg->fb_captcha()->exists() or !$pg->fb_send_email()->exists()) {
+                        throw new Exception('Page does not have needed fields.', 422);
+                    }
+                    // if user has selected to redirect to success/error pages,
+                    // let's make sure these pages exist:
+                    $ajax = $pg->fb_is_ajax()->toBool();
+                    $sPage = $pg->fb_success_page()->exists() ? $pg->fb_success_page()->toPage() : false;
+                    $ePage = $pg->fb_error_page()->exists() ? $pg->fb_error_page()->toPage() : false;
+                    if (!$sPage or !$ePage) {
+                        throw new Exception('Missing success/error page.', 422);
+                    }
+
+                    // check the CSRF token:
+                    if (!isset($data['fb_csrf']) or csrf($data['fb_csrf']) !== true) {
+                        throw new Exception('No valid CSRF token.', 403);
+                    } else {
+                        // passed CSRF check, so we can delete the CSRF field from our data array:
+                        unset($data['fb_csrf']);
+                    }
+
+                    // check honeypots:
+                    $honeyfields = $pg->fb_builder()->toBuilderBlocks()->filterBy('_key', '==', 'fb_honeypot');
+                    if (count($honeyfields) > 0) {
+                        foreach ($honeyfields as $field) {
+                            // the honeypot field should be empty -
+                            // if it's not, it was probably filled in by a spammer bot:
+                            if (!empty($data[$field->field_name()->value()])) {
+                                throw new Exception('Bot submission detected.', 403);
+                            }
+                            // honeypot is empty - we can remove the field from our data array:
+                            unset($data[$field->field_name()->value()]);
+                        }
+                    }
+                    // hCaptcha check - if it is being used:
+                    if ($pg->fb_captcha()->toBool() and $pg->fb_captcha_sitekey()->isNotEmpty() and $pg->fb_captcha_secretkey()->isNotEmpty()) {
+                        // check that the hCaptcha token has been set -
+                        // that is, the captcha has been answered and submitted::
+                        if (isset($data['h-captcha-response']) and !empty($data['h-captcha-response'])) {
+                            $hData = [
+                                'response' => $data['h-captcha-response'],
+                                'secret' => $pg->fb_captcha_secretkey()->value()
                             ];
-                            return $ePage->render($data);
-                        }
-                        // if the user is using ajax, we return an error:
-                        $body = '<h1>Processing Error 403</h1><p>hCaptcha expected.</p>';
-                        return new Response($body,'text/html', 403,['Warning'=>'hCaptcha expected']);
-                    }
-                }
-
-                // With all validation done, we now start data processing.
-                // We will store processing errors in an $errors array, and
-                // report to the user at the end if any of the functions fail:
-                $errors = '';
-
-                // remove unnecessary fields from the data array,
-                // so they don't get included in the sent/stored data:
-                unset($data['submit']); // remove the value sent by the 'submit' button
-                foreach ($data as $field => $value) {
-                    // remove any fields with empty values:
-                    if(empty($data[$field])) { unset($data[$field]); }
-                }
-
-                // EMAILING THE RECEIVED DATA:
-                // check whether we need to send the data via email:
-                if($pg->fb_send_email()->toBool() and $pg->fb_email_recipient()->exists() and $pg->fb_email_recipient()->isNotEmpty() and $pg->fb_email_sender_type()->exists()) {
-                    // determine the sender:
-                    if($pg->fb_email_sender_type()->toBool()) {
-                        // we get the sender from a form field:
-                        if(isset($data[$pg->fb_email_sender_field()->value()]) and !empty($data[$pg->fb_email_sender_field()->value()])){
-                            $sender = $data[$pg->fb_email_sender_field()->value()];
+                            $options = [
+                                'method'  => 'POST',
+                                'data'    => http_build_query($hData)
+                            ];
+                            $response = Remote::request('https://hcaptcha.com/siteverify', $options);
+                            $response = $response->json();
+                            // check whether the hCaptcha was answered successfully::
+                            if ($response['success'] == false) {
+                                throw new Exception('hCaptcha not validated.', 403);
+                            } else {
+                                // captcha has been answered successfully,
+                                // so we can now remove it from our data array:
+                                unset($data['h-captcha-response']);
+                                if (isset($data['g-recaptcha-response'])) {
+                                    unset($data['g-recaptcha-response']);
+                                }
+                            }
                         } else {
-                            $sender = 'form@' . parse_url(kirby()->request()->domain(),PHP_URL_HOST);
-                        }
-                    } else {
-                        // we get the sender from a panel field:
-                        if($pg->fb_email_sender()->isNotEmpty()){
-                            $sender = $pg->fb_email_sender()->value();
-                        } else {
-                            $sender = 'form@' . parse_url(kirby()->request()->domain(),PHP_URL_HOST);
+                            // captcha token hasn't been set - possible form hijacking:
+                            throw new Exception('hCaptcha expected.', 403);
                         }
                     }
-                    // determine the subject:
-                    if($pg->fb_email_subject()->exists()){
-                        $subject = $pg->fb_email_subject()->or('Website Form Submission');
-                    } else {
-                        $subject = 'Website Form Submission';
+
+                    // remove unnecessary fields from the data array,
+                    // so they don't get included in the sent/stored data:
+                    unset($data['submit']); // remove the value sent by the 'submit' button
+                    foreach ($data as $field => $value) {
+                        // remove any fields with empty values:
+                        if (empty($data[$field])) {
+                            unset($data[$field]);
+                        }
                     }
-                    // determining which email template to use:
-                    if(file_exists(kirby()->roots()->templates() . '/emails/fb.html.php') and file_exists(kirby()->roots()->templates() . '/emails/fb.text.php')) {
-                        // user has created html email templates, so we use those:
-                        $template = 'fb';
-                    } else if(file_exists(kirby()->roots()->templates() . '/emails/fb.php')) {
-                        // user has created a plain-text email template, so we'll use that:
-                        $template = 'fb';
-                    } else {
-                        // we'll use our default template:
-                        $template = 'fb_default';
+
+
+
+                    // TODO data validation: required, type, pattern matching?
+
+
+
+                    $double_optin_token = bin2hex(random_bytes(16));
+                    $project_id = site()->config_project_id()->toString();
+                    if (empty($project_id)) {
+                        throw new Exception('Invalid project id - please set one in the panel: site > settings > general > project id.', 422);
                     }
-                    // sending the email:
+
+                    // STORING THE SUBMISSION IN THE DATABASE:
+                    // gather the values we need to store:
+                    if ($pg->fb_key_field()->exists() and $pg->fb_key_field()->isNotEmpty() and isset($data[$pg->fb_key_field()->value()])) {
+                        // This is the unique identifier, we can only allow one combination of form-id + identifier in the database
+                        $unique_identifier = $data[$pg->fb_key_field()->value()];
+                    } else {
+                        // Use timestamp as unique value, if we allow duplicate entries
+                        $unique_identifier = time();
+                    }
+                    // build the content of the submission in readable format:
                     try {
-                      kirby()->email([
-                        'from' => $sender,
-                        'replyTo' => $sender,
-                        'to' => $pg->fb_email_recipient()->value(),
-                        'subject' => $subject,
-                        'template' => $template,
-                        'data' => ['page_id' => $pg->id(), 'fields' => $data]
-                      ]);
+                        $parsed_form_content = json_encode($data);
                     } catch (Exception $error) {
-                        $errors .= 'Mail server error: ' . $error->getMessage() . '. ';
+                        throw new Exception('Invalid form content', 422);
                     }
-                }
 
-                // STORING THE SUBMISSION IN THE CONTENT FILE:
-                // check whether we need to store the data in the panel:
-                if($pg->fb_save_submissions()->toBool()){
-                    if($pg->fb_received_submissions()->exists()) {
-                        // gather the values we need to store:
-                        $submission_date = date('Y-m-d H:i:s'); // datetime stamp
-                        if($pg->fb_key_field()->exists() and $pg->fb_key_field()->isNotEmpty() and isset($data[$pg->fb_key_field()->value()])) {
-                            // this is the field that will be shown in the 'key' column in the panel:
-                            $submission_key = $data[$pg->fb_key_field()->value()];
+                    // Save information to the database
+                    $inserted = Db::insert('form_submissions', [
+                        "token" => $double_optin_token,
+                        "email_confirmed" => $pg->fb_email_double_optin_active()->toBool() ? 0 : NULL,
+                        "form" => $pg->fb_form_id(),
+                        "identifier" => $unique_identifier,
+                        "project_id" => $project_id,
+                        "value" => $parsed_form_content,
+                    ]);
+                    if ($inserted === false) {
+                        $lastError = Db::connection()->lastError();
+                        kirby()->logToGrayLog(\Psr\Log\LogLevel::ERROR, 'Database insertion failed: ' . $lastError->getMessage());
+                        if ($lastError->getCode() === "23000") {
+                            throw new Exception('Duplicate submission', 422);
+                        }
+                        return false;
+                    }
+
+                    // Verify that all information that we need for sending emails is present
+                    if ($pg->fb_send_email()->toBool() or $pg->fb_email_double_optin_active()->toBool()) {
+                        $config_email_type = site()->config_email_type()->toString();
+                        $config_email_host = site()->config_email_host()->toString();
+                        $config_email_port = site()->config_email_port()->toInt($default = 0);
+                        $config_email_security = site()->config_email_security()->toString();
+                        $config_email_auth = site()->config_email_auth()->toBool($default = false);
+                        $config_email_username = site()->config_email_username()->toString();
+                        $config_email_password = site()->config_email_password()->toString();
+                    }
+
+                    $email_transport = [
+                        'type' => $config_email_type,
+                        'host' => $config_email_host,
+                        'port' => $config_email_port,
+                        'security' => $config_email_security,
+                        'auth' => $config_email_auth,
+                        'username' => $config_email_username,
+                        'password' => $config_email_password,
+                    ];
+
+                    // EMAILING THE RECEIVED DATA TO ADMIN EMAIL
+                    // check whether we need to send the data via email:
+                    if ($pg->fb_send_email()->toBool() and $pg->fb_email_recipient()->exists() and $pg->fb_email_recipient()->isNotEmpty()) {
+                        // determine the subject:
+                        if ($pg->fb_email_subject()->exists()) {
+                            $subject = $pg->fb_email_subject()->or('Website Form Submission');
                         } else {
-                            // if we can't find the field, we'll show show info from
-                            // whatever is the first field in our data array:
-                            $submission_key = Str::excerpt(array_values($data)[0],50);
+                            $subject = 'Website Form Submission';
                         }
-                        // build the content of the submission in readable format:
-                        $submission_content = '';
-                        foreach ($data as $field => $value) {
-                            $field = mb_strtoupper($field);
-                            $submission_content .= <<<CONTENT
-
-$field: $value
-
-CONTENT;
+                        // determining which email template to use:
+                        if (file_exists(kirby()->roots()->templates() . '/emails/fb.html.php') and file_exists(kirby()->roots()->templates() . '/emails/fb.text.php')) {
+                            // user has created html email templates, so we use those:
+                            $template = 'fb';
+                        } else if (file_exists(kirby()->roots()->templates() . '/emails/fb.php')) {
+                            // user has created a plain-text email template, so we'll use that:
+                            $template = 'fb';
+                        } else {
+                            // we'll use our default template:
+                            $template = 'fb_default';
                         }
-                        $submission = [
-                            'entry_date' => $submission_date,
-                            'entry_key' => $submission_key,
-                            'entry_content' => $submission_content
-                        ];
-                        // store the current contents of the log:
-                        $log = $pg->fb_received_submissions()->yaml();
-                        // add our new submission:
-                        $log[] = $submission;
-                        // finally, try to update the field in the content file:
+                        // sending the email:
                         try {
-                            kirby()->impersonate('kirby');
-                            $pg->update([
-                              'fb_received_submissions' => Yaml::encode($log)
+                            kirby()->email([
+                                'from' => $config_email_username,
+                                'replyTo' => $config_email_username,
+                                'to' => $pg->fb_email_recipient()->value(),
+                                'subject' => $subject,
+                                'template' => $template,
+                                'data' => ['page_id' => $pg->id(), 'fields' => $data],
+                                'transport' => $email_transport,
                             ]);
                         } catch (Exception $error) {
-                            $errors .= 'Submission logging failed: ' . $error->getMessage() . '. ';
+                            kirby()->logToGrayLog(\Psr\Log\LogLevel::ERROR, 'Mail server error: ' . $error->getMessage());
                         }
-
-                    } else {
-                        // the field where we're supposed to store our submissions
-                        // is not present on the page - we must advise the user:
-                        $errors .= 'Submission log field missing.';
                     }
-                }
-                // return report on success/failure of operations:
-                if(!empty($errors)) {
+
+                    // DOUBLE OPT-IN - CONFIRMATION EMAIL TO USER
+                    // check whether we need to send the data via email:
+                    if ($pg->fb_email_double_optin_active()->toBool() and $pg->fb_email_double_optin_recipient()->isNotEmpty()) {
+                        // we get the recipient from a panel field:
+                        if ($pg->fb_email_double_optin_recipient()->isNotEmpty()) {
+                            $recipient = $data[$pg->fb_email_double_optin_recipient()->value()];
+                        } else {
+                            throw new Exception('Missing email sender value', 422);
+                        }
+                        // determine the subject:
+                        if ($pg->fb_email_double_optin_subject()->exists()) {
+                            $subject = $pg->fb_email_double_optin_subject()->or('Please confirm your email address');
+                        } else {
+                            $subject = 'Please confirm your email address';
+                        }
+                        // Replace placeholders in email template with actual values
+                        $email_template = $pg->fb_email_double_optin_mail_template()->toString();
+                        preg_match_all('/{{([a-z0-9\-])+}}/', $email_template, $matches);
+                        if (!empty($matches) && !empty($matches[0])) {
+                            foreach ($matches[0] as $value) {
+                                $valueName = str_replace(str_split('{}'), '', $value);
+                                $email_template = str_replace($value, array_key_exists($valueName, $data) ? $data[$valueName] : '', $email_template);
+                            }
+                        }
+                        // Get the custom set logo
+                        $logo = $pg->fb_email_double_optin_mail_template_logo();
+                        try {
+                            kirby()->email([
+                                'from' => $config_email_username,
+                                'replyTo' => $config_email_username,
+                                'to' => $recipient,
+                                'subject' => $subject,
+                                'template' => 'double-opt-in',
+                                'data' => [
+                                    'token' => $double_optin_token,
+                                    'url' => site()->url(),
+                                    'content' => kirbytext($email_template),
+                                    'logo' => $logo,
+                                    'primary_color' => '#' . site()->color_primary()->or('F60F60'),
+                                    'secondary_color' => '#' . site()->color_secondary()->or('000000'),
+                                    'contrast_color' => '#' . site()->color_contrast()->or('FFFFFF'),
+                                    'off_white_color' => '#' . site()->color_off_white()->or('F0F0F0'),
+                                ],
+                                'transport' => $email_transport,
+                            ]);
+                        } catch (Exception $error) {
+                            throw new Exception("Mail server error: $error->getMessage().");
+                        }
+                    }
+                    // everything went fine - we have a successfull submission!:
                     if (!$ajax) {
                         // if the form is not using ajax, we send the user
-                        // to the error page, with appropriate data & info:
+                        // to the success page, with appropriate data & info:
                         $data = [
                             'fields' => $data,
-                            'error' => $errors
+                            'error' => ''
                         ];
-                        return $ePage->render($data);
+                        return go($sPage->url());
                     }
-                    // if the user is using ajax, we return an error:
-                    $body = '<h1>Server Error 500</h1><p>Server error: '. $errors . '.</p>';
-                    return new Response($body,'text/html', 500,['Warning'=>'Server error: ' . $errors]);
+                    // if the user is using ajax, we return a success message:
+                    return ['msg' => 'Form submitted successfully'];
+                } catch (Exception $e) {
+                    // Render error page or send in JSON format
+                    if (!$ajax) {
+                        // Not ajax, send to error page
+                        return $ePage->render(['errorCode' => $e->getCode(), 'errorMessage' => $e->getMessage()]);
+                    }
+                    $response = new Response();
+                    return $response->json(['Warning' => 'Server error: ' . $e->getMessage()], $e->getCode() ?? 500);
                 }
-                // everything went fine - we have a successfull submission!:
-                if(!$ajax) {
-                    // if the form is not using ajax, we send the user
-                    // to the success page, with appropriate data & info:
-                    $data = [
-                        'fields' => $data,
-                        'error' => ''
-                    ];
-                    return $sPage->render($data);
-                }
-                // if the user is using ajax, we return a success message:
-                return ['msg' => 'Form submitted successfully'];
-          }
+            }
         ]
-      ]
+    ]
 ]);

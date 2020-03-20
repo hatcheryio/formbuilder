@@ -19,7 +19,6 @@
         $fb_id = $pg->fb_form_id()->or('form-'.time());
         $fb_class = $pg->fb_form_class()->isEmpty() ? false : $pg->fb_form_class()->html();
         $fb_blocks = $pg->fb_builder()->toBuilderBlocks();
-        $useDiv = $pg->fb_usediv()->exists() ? $pg->fb_usediv()->toBool() : true;
         $isAjax = $pg->fb_is_ajax()->exists() ? $pg->fb_is_ajax()->toBool() : true;
         $msgPos = $pg->fb_msg_position()->exists() ? $pg->fb_msg_position()->toBool() : false;
         $hasCaptcha = $pg->fb_captcha()->exists() ? $pg->fb_captcha()->toBool() : false;

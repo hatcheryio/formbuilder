@@ -5,6 +5,8 @@ fields:
     extends: formbuilder/fields/name
   field_class:
     extends: formbuilder/fields/class
+  req:
+    extends: formbuilder/fields/req
   field_label:
     extends: formbuilder/fields/label
     label: Checkbox Label

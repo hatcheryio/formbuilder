@@ -1,13 +1,26 @@
 type: fields
 fields:
-  fb_form_settings:
-    type: toggle
-    label: Form Settings
-    translate: false
-    default: true
-    text:
-      - hide
-      - show
+  # ===============================================
+  # HEADLINE & DESCRIPTION
+  # ===============================================
+  headline_block_specific:
+    type: headline
+    numbered: false
+    label: Headline / description
+  headline:
+    label: Headline
+    type: text
+  text:
+    label: Text
+    type: textarea
+
+  # ===============================================
+  # BASIC FORM SETTINGS
+  # ===============================================
+  headline_form_builder:
+    type: headline
+    numbered: false
+    label: Form
   fb_form_id:
     type: text
     label: Form ID
@@ -19,8 +32,7 @@ fields:
     before: "#"
     width: 1/3
     help: A <strong>unique ID</strong> for your form.
-    when:
-      fb_form_settings: true
+    required: true
   fb_form_class:
     type: text
     label: Form Class
@@ -31,18 +43,6 @@ fields:
     before: "."
     width: 1/3
     help: Optional CSS class to add to the &lt;form&gt; element.
-    when:
-      fb_form_settings: true
-  fb_usediv:
-    type: toggle
-    label: Field Structure
-    default: true
-    text:
-      - plain &lt;input&gt;
-      - enclosed in &lt;div&gt;
-    width: 1/3
-    when:
-      fb_form_settings: true
   fb_builder:
     type: builder
     label: Form Fields
@@ -63,17 +63,12 @@ fields:
       fb_honeypot: formbuilder/blocks/fb_honeypot
       fb_line: formbuilder/blocks/fb_line
       fb_displaytext: formbuilder/blocks/fb_displaytext
-    when:
-      fb_form_settings: true
-
   fb_submit_label:
     type: text
-    label: 'Submit' Buton Label
+    label: 'Submit' Button Label
     placeholder: Send
     counter: false
     width: 1/3
-    when:
-      fb_form_settings: true
   fb_cancel_label:
     type: text
     label: 'Reset' Button label
@@ -81,8 +76,6 @@ fields:
     counter: false
     width: 1/3
     help: Leave empty to omit the button from the form.
-    when:
-      fb_form_settings: true
   fb_formbtns_class:
     type: text
     label: Enclosing Div Class
@@ -93,10 +86,15 @@ fields:
     before: "."
     width: 1/3
     help: Optional CSS class to add to the enclosing &lt;div&gt; element.
-    when:
-      fb_form_settings: true
-  fb_captcha_line:
-    type: line
+
+
+  # ===============================================
+  # CAPTCHA
+  # ===============================================
+  headline_captcha:
+    type: headline
+    numbered: false
+    label: Captcha
   fb_captcha:
     type: toggle
     label: Use hCaptcha
@@ -106,8 +104,6 @@ fields:
       - no hCaptcha
       - use hCaptcha
     width: 1/3
-    when:
-      fb_form_settings: true
     help: Sign up for hCaptcha <strong><a href="https://hCaptcha.com/?r=5c848162fd88">here</a></strong>.
   fb_captcha_theme:
     type: toggle
@@ -119,7 +115,6 @@ fields:
       - Dark Theme
     width: 1/3
     when:
-      fb_form_settings: true
       fb_captcha: true
   fb_captcha_secretkey:
     type: text
@@ -128,7 +123,6 @@ fields:
     counter: false
     width: 2/3
     when:
-      fb_form_settings: true
       fb_captcha: true
   fb_captcha_sitekey:
     type: text
@@ -137,16 +131,15 @@ fields:
     counter: false
     width: 2/3
     when:
-      fb_form_settings: true
       fb_captcha: true
 
   # ===============================================
-  # FORM RESPONSE CONFIGURATION
+  # SUCCESS / ERROR ACTIONS
   # ===============================================
-  fb_is_ajax_line:
-    type: line
-    when:
-      fb_form_settings: true
+  headline_redirect:
+    type: headline
+    numbered: false
+    label: Success / error actions
   fb_is_ajax:
     type: toggle
     label: "Success/Error Action"
@@ -156,8 +149,6 @@ fields:
       - go to another page
       - show message in-page
     width: 1/3
-    when:
-      fb_form_settings: true
   fb_msg_position:
     type: toggle
     label: Message Box Position
@@ -168,7 +159,6 @@ fields:
       - top of the form
     width: 1/3
     when:
-      fb_form_settings: true
       fb_is_ajax: true
   fb_success_page:
     type: pages
@@ -181,7 +171,6 @@ fields:
       query: false
     help: The page the user will go to when the form is successfully submitted.
     when:
-      fb_form_settings: true
       fb_is_ajax: false
   fb_error_page:
     type: pages
@@ -194,7 +183,6 @@ fields:
       query: false
     help: The page the user will go to if the form submission fails.
     when:
-      fb_form_settings: true
       fb_is_ajax: false
   fb_success_msg:
     type: textarea
@@ -207,7 +195,6 @@ fields:
     placeholder: Your form was received successfully - thank you!
     help: The message that is displayed when the form is successfully submitted.
     when:
-      fb_form_settings: true
       fb_is_ajax: true
   fb_error_msg:
     type: textarea
@@ -220,16 +207,15 @@ fields:
     placeholder: There was an issue sending your form data - please try again!
     help: The message that is displayed when there is an issue processing the form data.
     when:
-      fb_form_settings: true
       fb_is_ajax: true
 
   # ===============================================
-  # FORM EMAIL CONFIGURATION
+  # EMAILS
   # ===============================================
-  fb_send_email_line:
-    type: line
-    when:
-      fb_form_settings: true
+  headline_emails:
+    type: headline
+    numbered: false
+    label: Emails
   fb_send_email:
     type: toggle
     label: Submission Emails
@@ -239,123 +225,107 @@ fields:
       - do not send emails
       - send form data via email
     width: 1/3
-    when:
-      fb_form_settings: true
   fb_email_recipient:
     type: email
     label: Recipient Email Address
-    placeholder: john@example.com
+    placeholder: admin@example.com
     width: 2/3
     help: Email address that will receive the form emails.
     when:
-      fb_form_settings: true
       fb_send_email: true
-  fb_email_sender_type:
-    type: toggle
-    label: Sender Email
-    default: false
-    text:
-      - is always the same
-      - is based on a form field
-    width: 1/3
-    when:
-      fb_form_settings: true
-      fb_send_email: true
-  fb_email_sender:
-    type: email
-    label: Sender Email Address
-    placeholder: admin@example.com
-    width: 2/3
-    help: Email address that will send the form emails.
-    when:
-      fb_form_settings: true
-      fb_send_email: true
-      fb_email_sender_type: false
-  fb_email_sender_field:
-    type: select
-    label: Sender Email Field
-    options: query
-    query:
-      fetch: page.fb_builder.toStructure.filterBy('_key','==','fb_email')
-      text: "{{ structureItem.field_name }}"
-      value: "{{ structureItem.field_name }}"
-    help: Form field from which to get the sender's email address.
-    width: 2/3
-    when:
-      fb_form_settings: true
-      fb_send_email: true
-      fb_email_sender_type: true
   fb_email_subject:
     type: text
     label: Email Subject
     placeholder: "Message from {{site.title}}"
     help: 'Subject' heading of emails sent by this form - useful for filtering and archiving messages in your email app.
     when:
-      fb_form_settings: true
       fb_send_email: true
+
+  # ===============================================
+  # DOUBLE OPT-IN
+  # ===============================================
+  headline_doi:
+    type: headline
+    numbered: false
+    label: Double opt-in
+  fb_email_double_optin_active:
+    type: toggle
+    label: Send confirmation email to user (Double opt-in)
+    default: true
+    width: 1/3
+  fb_email_double_optin_recipient:
+    type: select
+    label: "Recipient's Email Field"
+    options: query
+    query:
+      # We need to overwrite the method, since the fb_builder property is now inside one of our blocks
+      fetch: page.builder.toBuilderBlocks.filterBy("_key", "form").first.fb_builder.toBuilderBlocks.filterBy('_key','==','fb_email')
+      text: "{{ structureItem.field_name }}"
+      value: "{{ structureItem.field_name }}"
+    help: Form field from which to get the recipient's email address (has to be an email field).
+    width: 2/3
+    when:
+      fb_email_double_optin_active: true
+  fb_email_double_optin_subject:
+    type: text
+    label: Email Subject
+    placeholder: "Website name | Please confirm your email address"
+    when:
+      fb_email_double_optin_active: true
+  fb_email_double_optin_mail_template:
+    type: textarea
+    label: Email template
+    width: 1/2
+    placeholder: |
+      Hello \{\{name}},
+
+      thanks for signing up...
+    when:
+      fb_email_double_optin_active: true
+  fb_email_double_optin_mail_template_info:
+    type: info
+    label: Template guide
+    text: |
+      You can reference form fields by wrapping their name in *double curly brackets*.
+      If the field is not available (e.g. if the user did not fill it out), it will be replaced by an empty string.
+      That's why you usually only want to use required fields in the template.
+
+      **Example:**
+      If you have&#8203; a field called **"name"**, you can use it in the template like this:
+
+      Hello \{\{name}}, it's great to have you on board.
+    width: 1/2
+  fb_email_double_optin_mail_template_logo:
+    label: Email logo
+    type: files
+    multiple: false
+    query: page.images
+    when:
+      fb_email_double_optin_active: true
 
 
   # ===============================================
   # RECEIVED SUBMISSIONS LIST
   # ===============================================
-  fb_submissions_line:
-    type: line
-    when:
-      fb_form_settings: true
-  fb_save_submissions:
-    type: toggle
-    label: Save Submissions
-    default: false
-    text:
-      - do not save submissions
-      - save all submissions
-    width: 1/3
-    help: Log all form submissions here.
-    when:
-      fb_form_settings: true
+  headline_submissions:
+    type: headline
+    numbered: false
+    label: Submissions
   fb_key_field:
     type: select
-    label: Key Field
+    label: Unique Field
     options: query
     query:
       fetch: page.fb_builder.toBuilderBlocks
       text: "{{ structureItem.field_name }}"
       value: "{{ structureItem.field_name }}"
-    width: 1/3
-    help: Field to display in 'Key' column of the Received Submissions table.
-    when:
-      fb_form_settings: true
-      fb_save_submissions: true
-  fb_received_submissions:
-    type: structure
-    label: Received Submissions
-    empty: no submissions received yet.
-    sortable: false
-    sortBy: entry_date desc
-    limit: 20
-    fields:
-      entry_date:
-        type: text
-        label: When
-        counter: false
-        spellcheck: disabled
-        disabled: true
-      entry_key:
-        type: hidden
-        label: Key
-        counter: false
-      entry_content:
-        type: textarea
-        label: Content
-        counter: false
-        font: monospace
-        buttons: false
-        spellcheck: false
-        disabled: true
-    columns:
-      entry_date:
-        width: 1/4
-      entry_key:
-        width: 3/4
-    when:
-      fb_save_submissions: true
+    width: 1/2
+    help: |
+      Field that has to be unique for the submissions (e.g. an email address, so users can only signup once per email).
+      Leave empty to allow for duplicate submissions.
+  fb_submissions_info:
+    label: Info
+    type: info
+    text: |
+      To view, export and delete submissions, go to the 📑 (link: /form-submissions text: form submissions overview target: _blank).
+    width: 1/2
