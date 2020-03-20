@@ -26,7 +26,7 @@
         $captchaSiteKey = $pg->fb_captcha_sitekey()->exists() ? $pg->fb_captcha_sitekey() : '';
         $captchaSecretKey = $pg->fb_captcha_secretkey()->exists() ? $pg->fb_captcha_secretkey() : '';
         $captchaTheme = $pg->fb_captcha_theme()->exists() ? $pg->fb_captcha_theme()->toBool() : false;
-        $actionURL = $site->url() . '/formbuilder/formhandler';
+        $actionURL = site()->url() . '/formbuilder/formhandler';
         $error = $error ?? false;
         $fields = $fields ?? false;
 ?>
