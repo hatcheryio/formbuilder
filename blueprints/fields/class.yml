@@ -1,8 +1,12 @@
 type: text
-label: Field Class
+label:
+  en: Field CSS class
+  de: Feld CSS Klasse
 counter: false
 translate: false
 spellcheck: false
 before: "."
 width: 1/2
-help: Optional CSS class(es) for this field.
+help:
+  en: Optional CSS class(es) for this field.
+  de: Optionale CSS Klasse(n) für dieses Feld.

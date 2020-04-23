@@ -17,7 +17,6 @@
     else:
         // setting variables that make our code easier to read:
         $fb_id = $pg->fb_form_id()->or('form-'.time());
-        $fb_class = $pg->fb_form_class()->isEmpty() ? false : $pg->fb_form_class()->html();
         $fb_blocks = $pg->fb_builder()->toBuilderBlocks();
         $isAjax = $pg->fb_is_ajax()->exists() ? $pg->fb_is_ajax()->toBool() : true;
         $msgPos = $pg->fb_msg_position()->exists() ? $pg->fb_msg_position()->toBool() : false;
@@ -29,7 +28,7 @@
         $error = $error ?? false;
         $fields = $fields ?? false;
 ?>
-<form id="<?= $fb_id ?>"<?php if($fb_class):?> class="<?= $fb_class ?>"<?php endif; ?> action="<?= $actionURL ?>" method="post">
+<form id="<?= $fb_id ?>" action="<?= $actionURL ?>" method="post">
 <?php if($isAjax and $msgPos): ?>    <div class="messagebox" hidden></div><?php endif; ?>
 <?php
         foreach($fb_blocks as $field):
@@ -76,7 +75,7 @@
 <div class="h-captcha" data-sitekey="<?= $captchaSiteKey ?>"<?php if($captchaTheme): ?> data-theme="dark"<?php endif; ?>></div>
 <script src="https://hcaptcha.com/1/api.js" async defer></script>
 <?php endif; ?>
-<div<?php if($pg->fb_formbtns_class()->isNotEmpty()): ?> class="<?= $pg->fb_formbtns_class()->html() ?>"<?php endif; ?>>
+<div>
     <button type="submit" name="submit"><?= $pg->fb_submit_label()->or("Submit")->html() ?></button>
 <?php if($pg->fb_cancel_label()->isNotEmpty()): ?>
     <button type="reset"><?= $pg->fb_cancel_label()->html() ?></button>

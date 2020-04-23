@@ -1,4 +1,6 @@
- name: Date Field
+ name:
+  en: Date Field
+  de: Datums Field
  label: "#{{field_name}}"
  fields:
     field_name:
@@ -14,18 +16,27 @@
       placeholder: "YYYY-MM-DD"
     default:
       extends: formbuilder/fields/value
-      label: Default Date
-      help: Must be in 'YYYY-MM-DD' format
+      help:
+        en: Must be in 'YYYY-MM-DD' format
+        de: Muss im Format 'YYYY-MM-DD' sein
     min:
       extends: formbuilder/fields/min
-      label: Min Date
+      label:
+        en: Min Date
+        de: Min. Datum
       placeholder: "1970-01-01"
-      help: Must be in 'YYYY-MM-DD' format
+      help:
+        en: Must be in 'YYYY-MM-DD' format
+        de: Muss im Format 'YYYY-MM-DD' sein
     max:
       extends: formbuilder/fields/max
-      label: Max Date
+      label:
+        en: Max Date
+        de: Max. Datum
       placeholder: "2050-12-31"
-      help: Must be in 'YYYY-MM-DD' format
+      help:
+        en: Must be in 'YYYY-MM-DD' format
+        de: Muss im Format 'YYYY-MM-DD' sein
     pattern:
       extends: formbuilder/fields/pattern
       spellcheck: false

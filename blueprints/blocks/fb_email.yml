@@ -1,4 +1,6 @@
- name: Email Field
+ name:
+  en: Email Field
+  de: E-Mail Feld
  label: "#{{field_name}}"
  fields:
     field_name:
@@ -14,7 +16,6 @@
       placeholder: john@example.com
     default:
       extends: formbuilder/fields/value
-      label: Default Text
     min:
       extends: formbuilder/fields/min
     max:

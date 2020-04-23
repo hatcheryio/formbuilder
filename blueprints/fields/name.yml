@@ -1,5 +1,7 @@
 type: text
-label: Field Name
+label:
+  en: Field name
+  de: Feld Name
 counter: false
 converter: slug
 translate: false
@@ -7,4 +9,6 @@ spellcheck: false
 required: true
 before: "#"
 width: 1/4
-help: <strong>Unique name</strong>, used for 'id' and 'name' attributes.
+help:
+  en: <strong>Unique name</strong>, used for 'id' and 'name' attributes.
+  de: <strong>Einzigartiger Name</strong>, genutzt für das 'id' und 'name' Attribute.

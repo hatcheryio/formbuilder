@@ -1,4 +1,6 @@
- name: Multi-Line Text Area
+ name:
+  en: Multi-Line Text Area
+  de: Text-Feld (Langtext)
  label: "#{{field_name}}"
  fields:
     field_name:
@@ -13,13 +15,15 @@
       extends: formbuilder/fields/placeholder
     default:
       extends: formbuilder/fields/value
-      label: Default Text
     min:
       extends: formbuilder/fields/min
     max:
       extends: formbuilder/fields/max
     rows:
-        type: number
-        label: Number of Lines
-        min: 3
-        width: 1/4
+      type: number
+      label:
+        en: Number of Lines
+        de: Anzahl an Zeilen
+      min: 3
+      placeholder: 3
+      width: 1/4

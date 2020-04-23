@@ -1,22 +1,23 @@
- name: Single-Line Text Field
- label: "#{{field_name}}"
- fields:
-    field_name:
-      extends: formbuilder/fields/name
-    field_class:
-      extends: formbuilder/fields/class
-    req:
-      extends: formbuilder/fields/req
-    field_label:
-      extends: formbuilder/fields/label
-    placeholder:
-      extends: formbuilder/fields/placeholder
-    default:
-      extends: formbuilder/fields/value
-      label: Default Text
-    min:
-      extends: formbuilder/fields/min
-    max:
-      extends: formbuilder/fields/max
-    pattern:
-      extends: formbuilder/fields/pattern
+name:
+  en: Single-Line Text Field
+  de: Text-Feld (Einzelzeile)
+label: '#{{field_name}}'
+fields:
+  field_name:
+    extends: formbuilder/fields/name
+  field_class:
+    extends: formbuilder/fields/class
+  req:
+    extends: formbuilder/fields/req
+  field_label:
+    extends: formbuilder/fields/label
+  placeholder:
+    extends: formbuilder/fields/placeholder
+  default:
+    extends: formbuilder/fields/value
+  min:
+    extends: formbuilder/fields/min
+  max:
+    extends: formbuilder/fields/max
+  pattern:
+    extends: formbuilder/fields/pattern

@@ -1,5 +1,7 @@
 type: number
-label: Min Length
+label:
+  en: Min Length
+  de: Min. Länge
 placeholder: 3
 min: 0
 width: 1/4

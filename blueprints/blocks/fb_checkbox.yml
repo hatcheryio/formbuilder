@@ -1,4 +1,6 @@
-name: Checkbox
+name:
+  en: Checkbox
+  de: Checkbox
 label: "#{{field_name}}"
 fields:
   field_name:
@@ -9,16 +11,20 @@ fields:
     extends: formbuilder/fields/req
   field_label:
     extends: formbuilder/fields/label
-    label: Checkbox Label
   default:
     extends: formbuilder/fields/value
-    label: Checkbox Value
   checked:
     type: toggle
-    label: ""
+    label:
+      en: Default value
+      de: Vorauswahl
     translate: false
     default: false
     text:
-      - not checked
-      - checked
+      en:
+        - not checked
+        - checked
+      de:
+        - nicht ausgewählt
+        - ausgewählt
     width: 1/3

@@ -1,4 +1,4 @@
-A form was submitted from the page "<?= page($page_id)->title() ?>",  from your site "<?= site()->title() ?>".
+A form was submitted from the page "<?= page($page_id)->title() ?>",  from your site "<?= site()->url() ?>".
 
 The submitted information is as follows:
 

@@ -1,49 +1,70 @@
- name: Select Menu
- label: "#{{field_name}}"
- fields:
-    field_name:
-      extends: formbuilder/fields/name
-    field_class:
-      extends: formbuilder/fields/class
-    req:
-      extends: formbuilder/fields/req
-    field_label:
-      extends: formbuilder/fields/label
-      label: Select Menu Label
-      help: Optional label for the select menu.
-    multiple:
-      type: toggle
-      label: "Selection Type"
-      translate: false
-      default: false
-      width: 1/3
-      text:
+name:
+  en: Select Menu
+  de: Select Menü
+label: '#{{field_name}}'
+fields:
+  field_name:
+    extends: formbuilder/fields/name
+  field_class:
+    extends: formbuilder/fields/class
+  req:
+    extends: formbuilder/fields/req
+  field_label:
+    extends: formbuilder/fields/label
+    label: Select Menu Label
+    help:
+      en: Optional label for the select menu.
+      de: Optionales Label für das Select Menü.
+  multiple:
+    type: toggle
+    label:
+      en: 'Selection Type'
+      de: 'Auswahl-Modus'
+    translate: false
+    default: false
+    width: 1/3
+    text:
+      en:
         - single item only
         - multiple items
-    menuitems:
-      type: structure
-      label: Select Menu Items
-      sortable: true
-      empty: No menu items defined yet.
-      fields:
-        item_label:
-          type: text
-          label: Menu Item Label
-          counter: false
-          width: 1/3
-        item_value:
-          type: text
-          label: Menu Item Value
-          counter: false
-          required: true
-          width: 1/3
-        item_state:
-          type: toggle
-          label: State
-          width: 1/3
-          text:
+      de:
+        - Einzelauswahl
+        - Mehrfachauswahl
+  menuitems:
+    type: structure
+    label:
+      en: Select Menu Items
+      de: Select Menü Einträge
+    sortable: true
+    empty:
+      en: No menu items defined yet.
+      de: Noch keine Einträge definiert.
+    fields:
+      item_label:
+        type: text
+        label:
+          en: Label
+          de: Label
+        counter: false
+        width: 1/3
+      item_value:
+        type: text
+        label:
+          en: Value
+          de: Wert
+        counter: false
+        required: true
+        width: 1/3
+      item_state:
+        type: toggle
+        label:
+          en: State
+          de: Vorausgewählt
+        width: 1/3
+        text:
+          en:
             - 'not selected'
             - 'selected'
-# preview:
-#   snippet: formbuilder/select_preview
-# defaultView: preview
+          de:
+            - 'nicht ausgewählt'
+            - 'ausgewählt'

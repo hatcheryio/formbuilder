@@ -1,33 +1,45 @@
- name: Time Field
- label: "#{{field_name}}"
- fields:
-    field_name:
-      extends: formbuilder/fields/name
-    field_class:
-      extends: formbuilder/fields/class
-    req:
-      extends: formbuilder/fields/req
-    field_label:
-      extends: formbuilder/fields/label
-    placeholder:
-      extends: formbuilder/fields/placeholder
-      placeholder: "16:30"
-    default:
-      extends: formbuilder/fields/value
-      label: Default Time
-      placeholder: "16:30"
-      help: Must be in 'HH:MM' (24-hour) format
-    min:
-      extends: formbuilder/fields/min
-      label: Min Time
-      placeholder: "16:30"
-      help: Must be in 'HH:MM' (24-hour) format
-    max:
-      extends: formbuilder/fields/max
-      label: Max Time
-      placeholder: "22:30"
-      help: Must be in 'HH:MM' (24-hour) format
-    pattern:
-      extends: formbuilder/fields/pattern
-      spellcheck: false
-      placeholder: "[0-9]{2}:[0-9]{2}"
+name:
+  en: Time Field
+  de: Zeit Feld
+label: '#{{field_name}}'
+fields:
+  field_name:
+    extends: formbuilder/fields/name
+  field_class:
+    extends: formbuilder/fields/class
+  req:
+    extends: formbuilder/fields/req
+  field_label:
+    extends: formbuilder/fields/label
+  placeholder:
+    extends: formbuilder/fields/placeholder
+    placeholder: '16:30'
+  default:
+    extends: formbuilder/fields/value
+    label: Default Time
+    placeholder: '16:30'
+    help:
+      en: Must be in 'HH:MM' (24-hour) format
+      de: Muss im Format 'HH:MM' (24-hour) sein
+  min:
+    extends: formbuilder/fields/min
+    label:
+      en: Min Time
+      de: Min. Zeit
+    placeholder: '16:30'
+    help:
+      en: Must be in 'HH:MM' (24-hour) format
+      de: Muss im Format 'HH:MM' (24-hour) sein
+  max:
+    extends: formbuilder/fields/max
+    label:
+      en: Max Time
+      de: Max. Zeit
+    placeholder: '22:30'
+    help:
+      en: Must be in 'HH:MM' (24-hour) format
+      de: Muss im Format 'HH:MM' (24-hour) sein
+  pattern:
+    extends: formbuilder/fields/pattern
+    spellcheck: false
+    placeholder: '[0-9]{2}:[0-9]{2}'

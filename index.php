@@ -1,6 +1,7 @@
 <?php
 
 use \Kirby\Database\Db;
+use \Kirby\Database\Database;
 use \Kirby\Cms\Response;
 use \Kirby\Cms\App as Kirby;
 
@@ -188,6 +189,24 @@ Kirby::plugin('cre8ivclick/formbuilder', [
                     }
 
                     // Save information to the database
+                    // Verify that the table exists
+                    $dbInstance = Db::connect();
+                    $tableExists = $dbInstance->validateTable('form_submissions');
+                    if (!$tableExists) {
+                        $dbInstance->query('CREATE TABLE `form_submissions` (
+                            `id` int(11) NOT NULL AUTO_INCREMENT,
+                            `token` varchar(32) NOT NULL,
+                            `email_confirmed` tinyint(1) DEFAULT NULL,
+                            `project_id` varchar(32) NOT NULL,
+                            `identifier` varchar(100) NOT NULL,
+                            `form` varchar(100) NOT NULL,
+                            `value` text NOT NULL,
+                            `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                            PRIMARY KEY (`id`),
+                            UNIQUE KEY `unique_identifier` (`project_id`,`form`,`identifier`) USING BTREE,
+                            UNIQUE KEY `token` (`token`)
+                        )');
+                    }
                     $inserted = Db::insert('form_submissions', [
                         "token" => $double_optin_token,
                         "email_confirmed" => $pg->fb_email_double_optin_active()->toBool() ? 0 : NULL,
@@ -197,7 +216,7 @@ Kirby::plugin('cre8ivclick/formbuilder', [
                         "value" => $parsed_form_content,
                     ]);
                     if ($inserted === false) {
-                        $lastError = Db::connection()->lastError();
+                        $lastError = $dbInstance->lastError();
                         kirby()->logToGrayLog(\Psr\Log\LogLevel::ERROR, 'Database insertion failed: ' . $lastError->getMessage());
                         if ($lastError->getCode() === "23000") {
                             throw new Exception('Duplicate submission', 422);

@@ -1,8 +1,14 @@
 type: toggle
-label: ""
+label:
+  en: Required
+  de: Erforderlich
 translate: false
 default: false
 text:
-  - not required
-  - required
+  en:
+    - not required
+    - required
+  de:
+    - nicht erforderlich
+    - erforderlich
 width: 1/4

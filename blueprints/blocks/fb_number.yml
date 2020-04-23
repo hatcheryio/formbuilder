@@ -1,29 +1,36 @@
- name: Number Field
- label: "#{{field_name}}"
- fields:
-    field_name:
-      extends: formbuilder/fields/name
-    field_class:
-      extends: formbuilder/fields/class
-    req:
-      extends: formbuilder/fields/req
-    field_label:
-      extends: formbuilder/fields/label
-    placeholder:
-      extends: formbuilder/fields/placeholder
-    default:
-      extends: formbuilder/fields/value
-      label: Default Number
-    min:
-      extends: formbuilder/fields/min
-      label: Min Value
-    max:
-      extends: formbuilder/fields/max
-      label: Max Value
-    step:
-      type: text
-      label: Step Value
-      counter: false
-      spellcheck: false
-      placeholder: "0.01"
-      width: 1/4
+name:
+  en: Number Field
+  de: Nummern Feld
+label: '#{{field_name}}'
+fields:
+  field_name:
+    extends: formbuilder/fields/name
+  field_class:
+    extends: formbuilder/fields/class
+  req:
+    extends: formbuilder/fields/req
+  field_label:
+    extends: formbuilder/fields/label
+  placeholder:
+    extends: formbuilder/fields/placeholder
+  default:
+    extends: formbuilder/fields/value
+  min:
+    extends: formbuilder/fields/min
+    label:
+      en: Min Value
+      de: Min. Wert
+  max:
+    extends: formbuilder/fields/max
+    label:
+      en: Max Value
+      de: Max. Wert
+  step:
+    type: text
+    label:
+      en: Step Value
+      de: Schritt-Schwelle
+    counter: false
+    spellcheck: false
+    placeholder: '0.01'
+    width: 1/4

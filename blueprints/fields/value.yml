@@ -1,4 +1,6 @@
 type: text
-label: Default Value
+label:
+  en: Default Value
+  de: Standardwert
 counter: false
 width: 1/3

@@ -1,5 +1,7 @@
 type: number
-label: Max Length
+label:
+  en: Max Length
+  de: Max. Länge
 placeholder: 100
 min: 0
 width: 1/4

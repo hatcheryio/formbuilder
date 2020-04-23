@@ -1,6 +1,8 @@
- name: Honeypot Field
- label: "#{{field_name}}"
- fields:
-    field_name:
-      extends: formbuilder/fields/name
-      width: 1/2
+name:
+  en: Honeypot Field
+  de: Honeypot Feld
+label: "#{{field_name}}"
+fields:
+  field_name:
+    extends: formbuilder/fields/name
+    width: 1/2

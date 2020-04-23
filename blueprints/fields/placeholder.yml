@@ -1,5 +1,9 @@
 type: text
-label: Placeholder Text
+label:
+  en: Placeholder Text
+  de: Platzhalter
 counter: false
 width: 1/3
-help: Optional sample text, shown before user types anything.
+help:
+  en: Optional sample text, shown before user types anything.
+  de: Optionaler Beispieltext, der gezeigt wird, bevor der Nutzer etwas eingibt
