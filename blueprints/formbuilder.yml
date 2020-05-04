@@ -200,6 +200,7 @@ fields:
       de: Bei Erfolg wird der Nutzer auf diese Seite weitergeleitet.
     when:
       fb_is_ajax: false
+    required: true
   fb_error_page:
     type: pages
     label:
@@ -218,6 +219,7 @@ fields:
       de: Bei einem Fehler wird der Nutzer auf diese Seite weitergeleitet.
     when:
       fb_is_ajax: false
+    required: true
   fb_success_msg:
     type: textarea
     label:
@@ -297,8 +299,8 @@ fields:
       en: Email Subject
       de: E-Mail Betreff
     placeholder:
-      en: "Message from {{site.title}}"
-      de: "Nachricht from {{site.title}}"
+      en: "Form submission from {{site.url}}"
+      de: "Formularanfrage von {{site.url}}"
     width: 1/3
     when:
       fb_send_email: true
@@ -385,7 +387,7 @@ fields:
 
         Hello \{\{name}}, it's great to have you on board.
       de: |
-        Du kannst Felder aus dem Formular auslesen, indem du deren Name in *doppelten geschweifte Klammern* schreibst.
+        Du kannst Felder aus dem Formular auslesen, indem du deren Name in *doppelten geschweiften Klammern* schreibst.
         Sollte das Feld nicht verfügbar sein (z.B. wenn der Nutzer dieses nicht ausgefüllt hat), wird es mit einer leeren Zeichenfolge ersetzt. Daher sollten in der E-Mail Vorlage nur Felder genutzt werden, die im Formular von dem Nutzer ausgefüllt werden *müssen*.
 
         **Beispiel:**
@@ -393,6 +395,8 @@ fields:
 
         Hallo \{\{name}}, es freut uns dich an Board zu haben.
     width: 1/2
+    when:
+      fb_email_double_optin_active: true
   fb_email_double_optin_mail_template_logo:
     label:
       en: Email logo

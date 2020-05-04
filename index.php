@@ -1,7 +1,6 @@
 <?php
 
 use \Kirby\Database\Db;
-use \Kirby\Database\Database;
 use \Kirby\Cms\Response;
 use \Kirby\Cms\App as Kirby;
 
@@ -233,27 +232,23 @@ Kirby::plugin('cre8ivclick/formbuilder', [
                         $config_email_auth = site()->config_email_auth()->toBool($default = false);
                         $config_email_username = site()->config_email_username()->toString();
                         $config_email_password = site()->config_email_password()->toString();
-                    }
 
-                    $email_transport = [
-                        'type' => $config_email_type,
-                        'host' => $config_email_host,
-                        'port' => $config_email_port,
-                        'security' => $config_email_security,
-                        'auth' => $config_email_auth,
-                        'username' => $config_email_username,
-                        'password' => $config_email_password,
-                    ];
+                        $email_transport = [
+                            'type' => $config_email_type,
+                            'host' => $config_email_host,
+                            'port' => $config_email_port,
+                            'security' => $config_email_security,
+                            'auth' => $config_email_auth,
+                            'username' => $config_email_username,
+                            'password' => $config_email_password,
+                        ];
+                    }
 
                     // EMAILING THE RECEIVED DATA TO ADMIN EMAIL
                     // check whether we need to send the data via email:
                     if ($pg->fb_send_email()->toBool() and $pg->fb_email_recipient()->exists() and $pg->fb_email_recipient()->isNotEmpty()) {
                         // determine the subject:
-                        if ($pg->fb_email_subject()->exists()) {
-                            $subject = $pg->fb_email_subject()->or('Website Form Submission');
-                        } else {
-                            $subject = 'Website Form Submission';
-                        }
+                        $subject = $pg->fb_email_subject()->or('Formularanfrage von ' . site()->url());
                         // determining which email template to use:
                         if (file_exists(kirby()->roots()->templates() . '/emails/fb.html.php') and file_exists(kirby()->roots()->templates() . '/emails/fb.text.php')) {
                             // user has created html email templates, so we use those:
