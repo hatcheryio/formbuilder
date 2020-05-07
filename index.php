@@ -177,8 +177,8 @@ Kirby::plugin('cre8ivclick/formbuilder', [
                         // This is the unique identifier, we can only allow one combination of form-id + identifier in the database
                         $unique_identifier = $data[$pg->fb_key_field()->value()];
                     } else {
-                        // Use timestamp as unique value, if we allow duplicate entries
-                        $unique_identifier = time();
+                        // Use random string as unique value, if we allow duplicate entries
+                        $unique_identifier = bin2hex(random_bytes(8));
                     }
                     // build the content of the submission in readable format:
                     try {
@@ -314,10 +314,10 @@ Kirby::plugin('cre8ivclick/formbuilder', [
                                     'url' => site()->url(),
                                     'content' => kirbytext($email_template),
                                     'logo' => $logo,
-                                    'primary_color' => '#' . site()->color_primary()->or('F60F60'),
-                                    'secondary_color' => '#' . site()->color_secondary()->or('000000'),
-                                    'contrast_color' => '#' . site()->color_contrast()->or('FFFFFF'),
-                                    'off_white_color' => '#' . site()->color_off_white()->or('F0F0F0'),
+                                    'primary_color' => site()->color_primary()->or('#F60F60'),
+                                    'secondary_color' => site()->color_secondary()->or('#000000'),
+                                    'contrast_color' => site()->color_contrast()->or('#FFFFFF'),
+                                    'off_white_color' => site()->color_off_white()->or('#F0F0F0'),
                                 ],
                                 'transport' => $email_transport,
                             ]);
